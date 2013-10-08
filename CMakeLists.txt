@@ -51,6 +51,7 @@ include(${VTK_USE_FILE})
 #-----------------------------------------------------------------------------
 add_subdirectory(common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
+include_directories(${Eigen_INCLUDE_DIR})
 add_subdirectory(ukf)
 add_subdirectory(vtk2mask)
 add_subdirectory(vtkFilter)
