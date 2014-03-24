@@ -242,10 +242,10 @@ VtkWriter
       {
       writer->SetFileTypeToBinary();
       }
-#if (VTK_MAJOR_VERSION < 6)
-    writer->SetInput(dataObject);
+#if (VTK_MAJOR_VERSION > 5)
+        writer->SetInputData(dataObject);
 #else
-    writer->SetInputData(dataObject);
+        writer->SetInput(dataObject);
 #endif
     writer->SetFileName(filename);
     writer->Write();

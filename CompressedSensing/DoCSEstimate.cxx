@@ -18,6 +18,9 @@
 #include "itkImageRegionConstIterator.h"
 #include "itkMultiThreader.h"
 #include "itkMedianImageFilter.h"
+#ifdef USE_CHAMBOLLE
+#include "ChambolleFilter.h"
+#endif
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -224,7 +227,18 @@ tvdenoise3(DoCSEstimate::DWIVectorImageType::Pointer &inputImage,
   typedef DoCSEstimate::B0AvgImageType TImage;
   TImage::Pointer f;
   FromVecImage(inputImage,gradientIndex,f);
-#if 1
+#define USE_MATLAB_TVDENOISE
+// #define USE_CHAMBOLLE
+#ifdef USE_CHAMBOLLE
+  typedef imageprocessing::ChambolleFilter<TImage,TImage> FilterType;
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(f);
+  filter->SetLambda(lambda);
+  filter->Update();
+  ToVecImage(filter->GetOutput(),gradientIndex,target);
+#endif
+
+#ifdef USE_MEDIAN
   typedef itk::MedianImageFilter<TImage,TImage> MedianFilterType;
   MedianFilterType::Pointer medianFilter = MedianFilterType::New();
   MedianFilterType::InputSizeType radius;
@@ -233,7 +247,8 @@ tvdenoise3(DoCSEstimate::DWIVectorImageType::Pointer &inputImage,
   medianFilter->SetInput(f);
   medianFilter->Update();
   ToVecImage(medianFilter->GetOutput(),gradientIndex,target);
-#else
+#endif
+#ifdef USE_MATLAB_TVDENOISE
 // if (nargin < 3),
 //     Tol = 1e-2;
 // end

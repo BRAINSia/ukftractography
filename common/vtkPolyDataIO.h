@@ -60,10 +60,10 @@ public:
           {
           writer->SetCompressorTypeToNone();
           }
-#if (VTK_MAJOR_VERSION < 6)
-        writer->SetInput(dataObject);
-#else
+#if (VTK_MAJOR_VERSION > 5)
         writer->SetInputData(dataObject);
+#else
+        writer->SetInput(dataObject);
 #endif
         writer->SetFileName(filename);
         writer->Write();
@@ -76,10 +76,10 @@ public:
           {
           writer->SetFileTypeToBinary();
           }
-#if (VTK_MAJOR_VERSION < 6)
-        writer->SetInput(dataObject);
-#else
+#if (VTK_MAJOR_VERSION > 5)
         writer->SetInputData(dataObject);
+#else
+        writer->SetInput(dataObject);
 #endif
         writer->SetFileName(filename);
         writer->Write();
