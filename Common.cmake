@@ -10,6 +10,10 @@ enable_language(CXX)
 include(CMakeDependentOption)
 include(Artichoke)
 
+#-----------------------------------------------------------------------------
+# Build option(s)
+#-----------------------------------------------------------------------------
+
 option(${PRIMARY_PROJECT_NAME}_INSTALL_DEVELOPMENT "Install development support include and libraries for external packages." OFF)
 mark_as_advanced(${PRIMARY_PROJECT_NAME}_INSTALL_DEVELOPMENT)
 
@@ -24,10 +28,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
-
-#-----------------------------------------------------------------------------
-# Build option(s)
-#-----------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -71,31 +71,15 @@ if(NOT COMMAND SETIFEMPTY)
   endmacro()
 endif()
 
-#
-# if you're building as a Slicer extension, this stuff
-# overrides the defaults being set up for the Extension.
-if(UKFTractography_SUPERBUILD AND NOT ${PRIMARY_PROJECT_NAME}_BUILD_SLICER_EXTENSION)
+#-----------------------------------------------------------------------------
+SETIFEMPTY(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+SETIFEMPTY(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+SETIFEMPTY(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
-  #-----------------------------------------------------------------------------
-  SETIFEMPTY(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-  SETIFEMPTY(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-  SETIFEMPTY(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-
-  #-----------------------------------------------------------------------------
-  SETIFEMPTY(CMAKE_INSTALL_LIBRARY_DESTINATION lib)
-  SETIFEMPTY(CMAKE_INSTALL_ARCHIVE_DESTINATION lib)
-  SETIFEMPTY(CMAKE_INSTALL_RUNTIME_DESTINATION bin)
-
-  set(SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION ${CMAKE_INSTALL_RUNTIME_DESTINATION})
-  set(SlicerExecutionModel_DEFAULT_CLI_INSTALL_LIBRARY_DESTINATION ${CMAKE_INSTALL_LIBRARY_DESTINATION})
-  set(SlicerExecutionModel_DEFAULT_CLI_INSTALL_ARCHIVE_DESTINATION ${CMAKE_INSTALL_ARCHIVE_DESTINATION})
-endif()
-
-# these apparently need to be set to something; 
-SETIFEMPTY(SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION bin)
-SETIFEMPTY(SlicerExecutionModel_DEFAULT_CLI_INSTALL_LIBRARY_DESTINATION lib)
-SETIFEMPTY(SlicerExecutionModel_DEFAULT_CLI_INSTALL_ARCHIVE_DESTINATION lib)
-
+#-----------------------------------------------------------------------------
+SETIFEMPTY(CMAKE_INSTALL_LIBRARY_DESTINATION lib)
+SETIFEMPTY(CMAKE_INSTALL_ARCHIVE_DESTINATION lib)
+SETIFEMPTY(CMAKE_INSTALL_RUNTIME_DESTINATION bin)
 
 #-------------------------------------------------------------------------
 # Augment compiler flags
@@ -108,13 +92,6 @@ if("${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang.*")
   set(CMAKE_COMPILER_IS_CLANGXX ON CACHE BOOL "compiler is CLang")
 endif()
 
-set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${ITK_REQUIRED_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ITK_REQUIRED_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}")
-
-
 #-----------------------------------------------------------------------------
 # Add needed flag for gnu on linux like enviroments to build static common libs
 # suitable for linking with shared object libs.
@@ -126,4 +103,10 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
   endif()
 endif()
+
+set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${ITK_REQUIRED_C_FLAGS}" CACHE STRING "CMake C Flags" FORCE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ITK_REQUIRED_CXX_FLAGS}" CACHE STRING "CMake CXX Flags" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}" CACHE STRING "CMake Linker Flags" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}" CACHE STRING "CMake shared linker Flags" FORCE)
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}" CACHE STRING "CMake module linker Flags" FORCE)
 
